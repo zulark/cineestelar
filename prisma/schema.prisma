@@ -1,0 +1,193 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["partialIndexes"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model bookings {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id           String         @db.Uuid
+  showtime_id       Int
+  status            booking_status @default(pending)
+  total_amount      Decimal        @default(0) @db.Decimal(10, 2)
+  payment_method    String?        @db.VarChar(50)
+  payment_reference String?        @db.VarChar(255)
+  created_at        DateTime       @default(now()) @db.Timestamptz(6)
+  expires_at        DateTime       @default(dbgenerated("(now() + '00:05:00'::interval)")) @db.Timestamptz(6)
+  showtimes         showtimes      @relation(fields: [showtime_id], references: [id], onUpdate: NoAction)
+  users             users          @relation(fields: [user_id], references: [id], onUpdate: NoAction)
+  tickets           tickets[]
+
+  @@index([showtime_id], map: "idx_bookings_showtime_id")
+  @@index([status, expires_at], map: "idx_bookings_status_expires")
+  @@index([user_id], map: "idx_bookings_user_id")
+}
+
+model movie_credits {
+  id        Int     @id @default(autoincrement())
+  movie_id  Int
+  person_id Int
+  role      String  @db.VarChar(50)
+  character String? @db.VarChar(255)
+  order     Int?
+  movies    movies  @relation(fields: [movie_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  people    people  @relation(fields: [person_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([movie_id, person_id, role], map: "uq_movie_person_role")
+  @@index([movie_id], map: "idx_movie_credits_movie")
+  @@index([person_id], map: "idx_movie_credits_person")
+}
+
+model movies {
+  id               Int             @id @default(autoincrement())
+  tmdb_id          Int             @unique
+  title            String          @db.VarChar(255)
+  original_title   String?         @db.VarChar(255)
+  synopsis         String?
+  duration_minutes Int
+  release_date     DateTime        @db.Date
+  language         String          @db.VarChar(50)
+  age_rating       String          @db.VarChar(10)
+  genre            String?         @db.VarChar(100)
+  poster_url       String?         @db.VarChar(500)
+  backdrop_url     String?         @db.VarChar(500)
+  trailer_url      String?         @db.VarChar(500)
+  movie_credits    movie_credits[]
+  showtimes        showtimes[]
+}
+
+model people {
+  id            Int             @id @default(autoincrement())
+  tmdb_id       Int             @unique
+  name          String          @db.VarChar(255)
+  profile_url   String?         @db.VarChar(500)
+  movie_credits movie_credits[]
+}
+
+model rooms {
+  id            Int         @id @default(autoincrement())
+  theater_id    Int
+  name          String      @db.VarChar(100)
+  type          room_type   @default(standard)
+  capacity      Int?
+  is_3d         Boolean     @default(false)
+  has_subtitles Boolean     @default(false)
+  theaters      theaters    @relation(fields: [theater_id], references: [id], onUpdate: NoAction)
+  seats         seats[]
+  showtimes     showtimes[]
+
+  @@index([theater_id], map: "idx_rooms_theater_id")
+}
+
+model seats {
+  id          Int       @id @default(autoincrement())
+  room_id     Int
+  row_letter  String    @db.VarChar(5)
+  seat_number Int
+  type        seat_type @default(standard)
+  rooms       rooms     @relation(fields: [room_id], references: [id], onUpdate: NoAction)
+  tickets     tickets[]
+
+  @@unique([room_id, row_letter, seat_number], map: "uq_seat_in_room")
+  @@index([room_id], map: "idx_seats_room_id")
+}
+
+/// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.
+model showtimes {
+  id                Int         @id @default(autoincrement())
+  movie_id          Int
+  room_id           Int
+  start_time        DateTime    @db.Timestamptz(6)
+  end_time          DateTime    @db.Timestamptz(6)
+  base_price        Decimal     @db.Decimal(10, 2)
+  format            show_format @default(format_2d)
+  language          String?     @db.VarChar(50)
+  subtitle_language String?     @db.VarChar(50)
+  bookings          bookings[]
+  movies            movies      @relation(fields: [movie_id], references: [id], onUpdate: NoAction)
+  rooms             rooms       @relation(fields: [room_id], references: [id], onUpdate: NoAction)
+  tickets           tickets[]
+
+  @@index([movie_id], map: "idx_showtimes_movie_id")
+  @@index([movie_id, start_time], map: "idx_showtimes_movie_start")
+  @@index([room_id], map: "idx_showtimes_room_id")
+  @@index([start_time], map: "idx_showtimes_start_time")
+}
+
+model theaters {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  address   String   @db.VarChar(500)
+  city      String   @db.VarChar(100)
+  state     String?  @db.VarChar(100)
+  timezone  String   @db.VarChar(50)
+  phone     String?  @db.VarChar(30)
+  email     String?  @db.VarChar(255)
+  latitude  Decimal? @db.Decimal(10, 7)
+  longitude Decimal? @db.Decimal(10, 7)
+  rooms     rooms[]
+
+  @@index([latitude, longitude], map: "idx_theaters_location")
+}
+
+model tickets {
+  id            Int            @id @default(autoincrement())
+  booking_id    String         @db.Uuid
+  seat_id       Int
+  showtime_id   Int
+  ticket_status booking_status @default(pending)
+  price_paid    Decimal        @db.Decimal(10, 2)
+  qr_code       String?        @unique @db.VarChar(255)
+  redeemed_at   DateTime?      @db.Timestamptz(6)
+  bookings      bookings       @relation(fields: [booking_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  seats         seats          @relation(fields: [seat_id], references: [id], onUpdate: NoAction)
+  showtimes     showtimes      @relation(fields: [showtime_id], references: [id], onUpdate: NoAction)
+
+  @@unique([showtime_id, seat_id], map: "uq_active_seat_per_showtime", where: raw("(ticket_status <> 'cancelled'::booking_status)"))
+  @@index([booking_id], map: "idx_tickets_booking_id")
+  @@index([seat_id], map: "idx_tickets_seat_id")
+}
+
+model users {
+  id         String     @id @db.Uuid
+  name       String     @db.VarChar(100)
+  phone      String?    @db.VarChar(30)
+  role       user_role  @default(customer)
+  created_at DateTime   @default(now()) @db.Timestamptz(6)
+  bookings   bookings[]
+}
+
+enum booking_status {
+  pending
+  confirmed
+  cancelled
+}
+
+enum room_type {
+  standard
+  imax
+  dx         @map("4dx")
+  vip_lounge
+}
+
+enum seat_type {
+  standard
+  vip
+  wheelchair
+  companion
+}
+
+enum show_format {
+  format_2d @map("2d")
+  format_3d @map("3d")
+  imax
+}
+
+enum user_role {
+  customer
+  staff
+  admin
+}
