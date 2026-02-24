@@ -16,11 +16,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get('/api/health', (req, res) => {
+app.get('/', (req, res) => {
     res.json({status: 'O cinema está aberto senhoras e senhores.'})
 });
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
-    console.log('Server: \x1b[36m%s\x1b[0m', 'http://localhost:${PORT}');
+    console.log('Server: \x1b[36m%s\x1b[0m', `http://localhost:${PORT}`);
 })
