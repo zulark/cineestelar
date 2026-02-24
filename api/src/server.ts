@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
+import movieRoutes from './routes/movies.routes';
 
 dotenv.config();
 
@@ -13,14 +14,14 @@ const adapter = new PrismaPg(pool);
 export const prisma = new PrismaClient({ adapter });
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req, res) => {
-    res.json({status: 'O cinema está aberto senhoras e senhores.'})
-});
 
-const PORT = process.env.PORT;
+app.use('/filmes', movieRoutes)
+
+const PORT = 8000;
 app.listen(PORT, () => {
     console.log('Server: \x1b[36m%s\x1b[0m', `http://localhost:${PORT}`);
 })
