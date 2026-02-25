@@ -19,7 +19,11 @@ app.use(cors());
 app.use(express.json());
 
 
-app.use('/filmes', movieRoutes)
+app.get('/', (req, res) => {
+    res.send('API de Filmes');
+});
+
+app.use('/api/filmes', movieRoutes)
 
 const PORT = 8000;
 app.listen(PORT, () => {
