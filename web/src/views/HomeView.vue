@@ -3,7 +3,7 @@
         <MovieCarousel :movies="onScreenMovies" />
 
 
-        <section class="max-w-7xl mx-auto py-16">
+        <section class="max-w-7xl mx-auto py-16 px-4 md:px-8">
             <h1 class="text-center text-3xl font-bold mb-6">Em Breve</h1>
 
             <div v-if="loading && upComingMovies.length > 0"
@@ -11,11 +11,11 @@
                 <div class="w-8 h-8 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin"></div>
             </div>
 
-            <div v-else class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-[300px]">
+            <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 auto-rows-[250px] md:auto-rows-[300px]">
 
                 <div v-for="(movie, index) in upComingMovies.slice(0, 5)" :key="movie.id"
                     class="group relative cursor-pointer overflow-hidden rounded-xs bg-[#1a1b20] border border-white/5 transition-all duration-50"
-                    :class="{ 'md:col-span-2 md:row-span-1': index === 0 }">
+                    :class="{ 'sm:col-span-2 sm:row-span-1 md:col-span-2 md:row-span-1': index === 0 }">
 
                     <div
                         class="absolute inset-0 z-10 bg-linear-to-t from-[#0f1014] via-transparent to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-80">
@@ -26,12 +26,12 @@
                         loading="lazy">
 
                     <div
-                        class="absolute bottom-0 left-0 w-full p-6 z-20  transition-transform duration-300 group-hover:translate-y-0">
+                        class="absolute bottom-0 left-0 w-full p-4 md:p-6 z-20 transition-transform duration-300 group-hover:translate-y-0">
                         <span
-                            class="text-xs font-medium tracking-tighter uppercase text-red-400 mb-2 block opacity-0 - transition-all duration-300 delay-100 group-hover:opacity-100 group-hover:translate-y-0">
+                            class="text-xs font-medium tracking-tighter uppercase text-red-400 mb-1 md:mb-2 block opacity-0 transition-all duration-300 delay-100 group-hover:opacity-100 group-hover:translate-y-0">
                             {{ movie.release_date.split('-')[0] }}
                         </span>
-                        <h3 class="text-lg md:text-xl font-bold text-white tracking-wide leading-tight drop-shadow-lg">
+                        <h3 class="text-base md:text-lg lg:text-xl font-bold text-white tracking-wide leading-tight drop-shadow-lg">
                             {{ movie.title }}
                         </h3>
                     </div>
@@ -39,11 +39,11 @@
             </div>
         </section>
 
-        <div class="flex items-center justify-center w-full">
-            <hr class="w-1/2 border-t border-white/20 self-center">
+        <div class="flex items-center justify-center w-full px-4 md:px-8">
+            <hr class="w-full md:w-1/2 border-t border-white/20 self-center">
         </div>
 
-        <section class="max-w-7xl mx-auto py-16">
+        <section class="max-w-7xl mx-auto py-16 px-4 md:px-8">
 
             <h2 class="text-center text-3xl font-bold mb-6">
                 Em cartaz
@@ -54,7 +54,7 @@
                 <div class="w-8 h-8 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin"></div>
             </div>
 
-            <div v-else class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            <div v-else class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
                 <div v-for="movie in onScreenMovies.slice(0, 10)" :key="movie.id"
                     class="group relative cursor-pointer rounded-xs overflow-hidden transition-all duration-500">
 
@@ -63,32 +63,36 @@
                             class="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/20 z-10">
                         </div>
                         <img :src="`https://image.tmdb.org/t/p/w500${movie.poster_path}`"
-                            class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-102"
+                            class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                             :alt="movie.title" loading="lazy">
 
                         <div
-                            class="absolute inset-x-0 bottom-0 p-4 bg-black/40 border-t border-white/10 translate-y-full transition-transform duration-300 group-hover:translate-y-0 z-20">
+                            class="absolute inset-x-0 bottom-0 p-2 md:p-4 bg-black/40 border-t border-white/10 translate-y-full transition-transform duration-300 group-hover:translate-y-0 z-20">
                             <!-- <p class="text-lg text-gray-300 mb-1">Assista agora</p> -->
                             <button
-                                class="w-full py-2 bg-red-900 rounded text-xs font-bold uppercase tracking-wider transition-colors">Comprar
+                                class="w-full py-1.5 md:py-2 bg-red-900 rounded text-[10px] md:text-xs font-bold uppercase tracking-wider transition-colors">Comprar
                                 Ingresso</button>
                         </div>
                     </div>
 
-                    <div class="py-4">
-                        <h3 class="font-medium text-white truncate tracking-wide">{{ movie.title }}</h3>
-
-                        <p class="text-xs text-gray-500 mt-1">{{ movie.release_date.split('-')[0] }}</p>
+                    <div class="py-2 md:py-4">
+                        <h3 class="font-medium text-sm md:text-base text-white truncate tracking-wide">{{ movie.title }}</h3>
+                        <div class="flex items-center gap-2">
+                            <p class="text-xs text-neutral-400">{{ getGenreNames(movie.genre_ids).join(' · ') }}</p>
+                            <p class="text-xs text-neutral-400">· {{ movie.runtime }} min</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 </template>
+
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { api } from '@/services/api'
-import MovieCarousel from '@/components/MovieCarousel.vue'
+import { ref, onMounted } from 'vue';
+import { api } from '@/services/api';
+import MovieCarousel from '@/components/MovieCarousel.vue';
+import getGenreNames from '@/utils/genres';
 
 interface Movie {
     id: number;
@@ -98,40 +102,57 @@ interface Movie {
     poster_path: string;
     overview: string;
     genre_ids: number[];
+    runtime?: number;
+};
+
+const onScreenMovies = ref<Movie[]>([]);
+const upComingMovies = ref<Movie[]>([]);
+
+const loading = ref(true);
+
+const enrichWithRuntime = async (movies: Movie[]) => {
+    return await Promise.all(
+        movies.map(async (movie) => {
+            try {
+                const response = await api.get(`/filmes/${movie.id}`)
+                return { ...movie, runtime: response.data.runtime }
+            } catch (error) {
+                console.error(`Erro ao buscar detalhes do filme ${movie.id}:`, error)
+                return movie
+            }
+        })
+    )
 }
-
-const onScreenMovies = ref<Movie[]>([])
-const upComingMovies = ref<Movie[]>([])
-
-const loading = ref(true)
 
 const getOnScreenMovies = async () => {
     try {
         const response = await api.get('/filmes/em-cartaz')
-        onScreenMovies.value = response.data.results
+        const movies = response.data.results
+        onScreenMovies.value = await enrichWithRuntime(movies)
     } catch (error) {
         console.error('Erro ao buscar filmes:', error)
     } finally {
         loading.value = false
     }
-}
+};
 
 const getUpComingMovies = async () => {
     try {
         const response = await api.get('/filmes/em-breve')
-        upComingMovies.value = response.data.results
+        const movies = response.data.results
+        upComingMovies.value = await enrichWithRuntime(movies)
     } catch (error) {
         console.error('Erro ao buscar filmes:', error)
     } finally {
         loading.value = false
     }
-}
-
+};
 
 onMounted(async () => {
     getOnScreenMovies()
     getUpComingMovies()
-})
+});
+
 </script>
 
 <style scoped>

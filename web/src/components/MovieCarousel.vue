@@ -11,30 +11,31 @@
       <div class="absolute inset-0 bg-linear-to-r from-[#0a0a0a]/80 via-transparent to-transparent z-10"></div>
 
       <div
-        class="absolute inset-0 z-20 grid grid-cols-12 grid-rows-6 px-8 md:px-16 pb-12 pt-24 h-full pointer-events-none">
+        class="absolute inset-0 z-20 grid grid-cols-12 grid-rows-6 px-4 sm:px-8 md:px-16 pb-8 md:pb-12 pt-20 md:pt-24 h-full pointer-events-none">
 
         <div class="col-span-12 md:col-span-9 row-start-3 md:row-start-3 flex items-end">
           <h1 style="font-family: 'Bebas Neue', cursive;"
-            class="text-6xl md:text-8xl font-bold tracking-tighter text-white leading-[0.9] uppercase mix-blend-overlay opacity-90">
+            class="text-5xl sm:text-6xl md:text-8xl font-bold tracking-tight text-white leading-[0.9] uppercase mix-blend-overlay opacity-90">
             {{ movie.title }}
           </h1>
         </div>
 
         <div
-          class="col-span-12 md:col-span-4 row-start-5 md:row-start-5 flex flex-col justify-end items-start gap-8 pointer-events-auto mt-8 md:mt-0">
-          <p class="text-xs text-neutral-400 pl-2">
+          class="col-span-12 md:col-span-4 row-start-4 md:row-start-5 flex flex-col justify-end items-start gap-3 sm:gap-4 md:gap-8 pointer-events-auto mt-4 sm:mt-6 md:mt-0 max-w-md">
+          <p class="text-[10px] sm:text-xs text-neutral-400 pl-1 md:pl-2">
             {{ getGenreNames(movie.genre_ids).join(' · ') }}
+            <span v-if="movie.runtime"> · {{ movie.runtime }} min</span>
           </p>
-          <p class="text-neutral-400 text-sm tracking-widest border-neutral-600 pl-2 h-full flex items-center">
-            {{ movie.overview.length > 500 ? movie.overview.slice(0, 500) + '...' : movie.overview }}
+          <p class="text-xs sm:text-sm text-neutral-300 md:text-neutral-400 md:text-sm tracking-normal md:tracking-widest border-neutral-600 pl-1 md:pl-2 md:h-full flex items-center line-clamp-3 sm:line-clamp-4 md:line-clamp-none">
+            {{ movie.overview.length > 150 ? movie.overview.slice(0, 150) + '...' : movie.overview }}
           </p>
 
           <button
-            class="pl-2 group/btn flex items-center gap-4 text-neutral-300 hover:text-white transition-all duration-300">
-            <span class="text-lg font-medium tracking-wide  group-hover/btn:border-neutral-300 pb-1">Comprar
+            class="pl-1 md:pl-2 group/btn flex items-center gap-2 sm:gap-4 text-neutral-300 hover:text-white transition-all duration-300">
+            <span class="text-base sm:text-lg font-medium tracking-wide group-hover/btn:border-neutral-300 pb-1">Comprar
               Ingresso</span>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-              stroke="currentColor" class="w-6 h-6 transform group-hover/btn:translate-x-2 transition-transform">
+              stroke="currentColor" class="w-5 h-5 sm:w-6 sm:h-6 transform group-hover/btn:translate-x-2 transition-transform">
               <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
             </svg>
           </button>
@@ -43,26 +44,20 @@
       </div>
     </div>
 
-    <div class="absolute bottom-12 right-12 z-30 flex items-center gap-8">
-      <div class="flex gap-1">
-        <span class="text-white font-medium text-lg">{{ String(currentSlide + 1).padStart(2, '0') }}</span>
-        <span class="text-neutral-600 text-lg">/</span>
-        <span class="text-neutral-600 text-lg">{{ String(featuredMovies.length).padStart(2, '0') }}</span>
-      </div>
-
-      <div class="flex gap-2">
+    <div class="absolute bottom-6 right-6 md:bottom-12 md:right-12 z-30 flex items-center gap-4 md:gap-8">
+      <div class="flex gap-1 md:gap-2">
         <button @click="prevSlide"
-          class="p-4 border border-white/10 hover:border-white/40 hover:bg-white/5 transition-all duration-300 rounded-none">
+          class="p-2 md:p-4 border border-white/10 hover:border-white/40 hover:bg-white/5 transition-all duration-300 rounded-none">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-            stroke="currentColor" class="w-5 h-5 text-white">
+            stroke="currentColor" class="w-4 h-4 md:w-5 md:h-5 text-white">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
           </svg>
         </button>
 
         <button @click="nextSlide"
-          class="p-4 border border-white/10 hover:border-white/40 hover:bg-white/5 transition-all duration-300 rounded-none">
+          class="p-2 md:p-4 border border-white/10 hover:border-white/40 hover:bg-white/5 transition-all duration-300 rounded-none">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-            stroke="currentColor" class="w-5 h-5 text-white">
+            stroke="currentColor" class="w-4 h-4 md:w-5 md:h-5 text-white">
             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
           </svg>
         </button>
@@ -83,7 +78,7 @@ interface Movie {
   poster_path: string;
   overview: string;
   genre_ids: number[];
-  duration?: number;
+  runtime?: number;
 }
 
 const props = defineProps<{
@@ -132,5 +127,4 @@ const getImageUrl = (path: string) => `https://image.tmdb.org/t/p/w1280${path}`
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;700;900&display=swap');
-
 </style>
